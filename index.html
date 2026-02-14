@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Forever Mariz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #1a0a0a;
+      --bg-secondary: #2d1515;
+      --accent-1: #ff4d6d;
+      --accent-2: #ff8fa3;
+      --accent-3: #ffb3c1;
+      --gold: #d4a574;
+      --text-primary: #fff5f5;
+      --text-muted: #ffb3c1;
+      --card-bg: rgba(45, 21, 21, 0.8);
+      --glass: rgba(255, 77, 109, 0.1);
+      --blob-opacity: 0.4;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    .theme-green {
+      --accent-1: #2dd4bf;
+      --accent-2: #5eead4;
+      --accent-3: #99f6e4;
+      --gold: #a7f3d0;
+      --text-muted: #86efac;
+      --card-bg: rgba(21, 45, 31, 0.8);
+      --glass: rgba(45, 212, 191, 0.1);
+    }
+
+    .theme-light {
+      --bg-primary: #fff8f8;
+      --bg-secondary: #ffffff;
+      --text-primary: #4a2c2a;
+      --text-muted: #8a5c5a;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --glass: rgba(255, 77, 109, 0.08);
+      --blob-opacity: 0.15;
+    }
+
+    .theme-light.theme-green {
+      --bg-primary: #f0fdf4;
+      --bg-secondary: #ffffff;
+      --text-primary: #1a3a2a;
+      --text-muted: #3a6a5a;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --glass: rgba(45, 212, 191, 0.08);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background 0.5s ease, color 0.5s ease;
+      /* Optimize scrolling on iOS */
+      -webkit-overflow-scrolling: touch;
+    }
+
+    h1, h2, h3, .display-font {
+      font-family: 'Playfair Display', serif;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .gradient-bg {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    }
+
+    .glass-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px); /* Safari support */
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      transition: background 0.5s ease;
+    }
+
+    .theme-light .glass-card {
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      color: white;
+      padding: 16px 32px; /* Slightly larger for touch */
+      border-radius: 50px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 32px rgba(255, 77, 109, 0.3);
+      font-size: 16px; /* Prevents iOS zoom on focus */
+      width: 100%;
+    }
+
+    .theme-green .btn-primary {
+      box-shadow: 0 8px 32px rgba(45, 212, 191, 0.3);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.96);
+    }
+    
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .input-field {
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 18px 20px; /* Larger padding for touch */
+      color: var(--text-primary);
+      font-size: 16px; /* Prevents iOS zoom */
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .theme-light .input-field {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent-1);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-muted);
+      opacity: 0.6;
+    }
+
+    /* Floating Hearts */
+    .heart {
+      position: fixed;
+      pointer-events: none;
+      opacity: 0;
+      animation: floatHeart 8s ease-in-out infinite;
+      z-index: 1;
+    }
+
+    @keyframes floatHeart {
+      0% { opacity: 0; transform: translateY(100vh) rotate(0deg) scale(0); }
+      10% { opacity: 0.8; transform: translateY(80vh) rotate(45deg) scale(1); }
+      90% { opacity: 0.6; transform: translateY(-10vh) rotate(-45deg) scale(0.8); }
+      100% { opacity: 0; transform: translateY(-20vh) rotate(0deg) scale(0); }
+    }
+
+    /* Page transitions */
+    .page {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      min-height: 100vh;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: translateY(30px);
+      z-index: 10;
+      overflow-y: auto;
+      /* Padding at the bottom to prevent content being hidden by nav */
+      padding-bottom: calc(100px + var(--safe-bottom));
+    }
+
+    .page.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      position: relative;
+    }
+
+    /* Background blobs */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: var(--blob-opacity);
+      pointer-events: none;
+      z-index: 0;
+      transition: opacity 0.5s ease;
+    }
+
+    .blob-1 { width: 300px; height: 300px; background: var(--accent-1); top: -50px; right: -50px; animation: blobMove 15s ease-in-out infinite; }
+    .blob-2 { width: 250px; height: 250px; background: var(--accent-2); bottom: -50px; left: -50px; animation: blobMove 12s ease-in-out infinite reverse; }
+    .blob-3 { width: 200px; height: 200px; background: var(--gold); top: 40%; left: 40%; animation: blobMove 18s ease-in-out infinite; animation-delay: -5s; }
+
+    @keyframes blobMove {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      25% { transform: translate(20px, -20px) scale(1.1); }
+      50% { transform: translate(-15px, 15px) scale(0.95); }
+      75% { transform: translate(15px, 20px) scale(1.05); }
+    }
+
+    /* Navbar - iPhone Optimized */
+    .navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-around;
+      z-index: 100;
+      box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+      /* iPhone Safe Area Support */
+      padding-bottom: var(--safe-bottom);
+      padding-top: 12px;
+    }
+
+    .theme-light .navbar {
+      border-top-color: rgba(0,0,0,0.05);
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 10px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      min-width: 60px;
+    }
+
+    .nav-btn:hover, .nav-btn.active {
+      color: var(--accent-1);
+      background: var(--glass);
+    }
+
+    .nav-btn svg { width: 24px; height: 24px; }
+
+    /* Feature cards */
+    .feature-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+    }
+    
+    .theme-light .feature-card { border-color: rgba(0,0,0,0.05); }
+    .feature-card:active { transform: scale(0.98); }
+
+    /* Countdown / Timer */
+    .countdown-item {
+      background: var(--glass);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 12px 8px;
+      flex: 1;
+      text-align: center;
+    }
+    
+    .theme-light .countdown-item { border-color: rgba(0,0,0,0.05); }
+
+    .countdown-number {
+      font-size: clamp(1.5rem, 5vw, 2rem); /* Fluid font size */
+      font-weight: 700;
+      font-family: 'Playfair Display', serif;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Game Progress */
+    .progress-bar-bg {
+      background: rgba(0,0,0,0.2);
+      height: 14px;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+    
+    .theme-light .progress-bar-bg { background: rgba(0,0,0,0.05); }
+
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      transition: width 0.3s ease;
+    }
+
+    /* Reward Card */
+    .reward-card {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      color: #4a2c2a;
+    }
+    
+    .reward-card.claimed { opacity: 0.6; border-style: dashed; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 400px;
+      transform: scale(0.9) translateY(20px);
+      transition: all 0.3s ease;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    
+    .theme-light .modal-content { background: #ffffff; border-color: rgba(0,0,0,0.1); }
+    .modal-overlay.active .modal-content { transform: scale(1) translateY(0); }
+
+    /* Responsive Utilities */
+    @media (min-width: 640px) {
+      .navbar { justify-content: center; gap: 16px; padding: 12px 20px; }
+      .nav-btn { padding: 12px 16px; }
+      .feature-card { padding: 24px; }
+    }
+    
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Background Blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- Floating Hearts Container -->
+  <div id="hearts-container"></div>
+
+  <!-- LOGIN PAGE -->
+  <div id="login-page" class="page active">
+    <div class="min-h-screen flex items-center justify-center p-6 relative z-10">
+      <div class="w-full max-w-md">
+        <div class="text-center mb-10">
+          <div class="inline-block mb-6">
+            <svg class="w-20 h-20 mx-auto" viewBox="0 0 100 100" fill="none">
+              <path d="M50 88C50 88 10 60 10 35C10 20 22 10 35 10C44 10 50 16 50 16C50 16 56 10 65 10C78 10 90 20 90 35C90 60 50 88 50 88Z" fill="url(#heartGrad)" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+              <defs>
+                <linearGradient id="heartGrad" x1="10" y1="10" x2="90" y2="90">
+                  <stop offset="0%" style="stop-color:var(--accent-1)"/>
+                  <stop offset="100%" style="stop-color:var(--accent-2)"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <h1 class="text-4xl md:text-5xl font-bold mb-3 display-font">Forever Mariz</h1>
+          <p class="text-lg" style="color: var(--text-muted)">Our little world</p>
+        </div>
+
+        <div class="glass-card p-8">
+          <h2 class="text-2xl font-semibold mb-6 text-center display-font">Welcome</h2>
+          <form id="login-form" class="space-y-5">
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Username</label>
+              <input type="text" id="username" class="input-field" placeholder="Enter username" autocomplete="username">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Password</label>
+              <input type="password" id="password" class="input-field" placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <p id="login-error" class="text-sm text-center hidden" style="color: var(--accent-1)">Invalid credentials.</p>
+            <button type="submit" class="btn-primary mt-6">Enter</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="home-page" class="page">
+    <div class="relative z-10 p-6">
+      <div class="max-w-2xl mx-auto">
+        <header class="text-center pt-10 pb-10">
+          <p class="text-sm uppercase tracking-widest mb-2" style="color: var(--gold)">Welcome to</p>
+          <h1 class="text-4xl md:text-5xl font-bold mb-4 display-font">Forever Mariz</h1>
+          <p style="color: var(--text-muted)">Every second with you counts</p>
+        </header>
+
+        <!-- Time Together Counter -->
+        <div class="glass-card p-6 mb-6">
+          <h3 class="text-lg font-semibold mb-4 text-center">Time We've Been Together</h3>
+          <p class="text-center mb-4" style="color: var(--accent-2)">Since February 28, 2024</p>
+          <div class="flex justify-center gap-2 flex-wrap" id="time-together">
+            <div class="countdown-item">
+              <div class="countdown-number" id="years">00</div>
+              <div class="text-xs" style="color: var(--text-muted)">Years</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-number" id="months">00</div>
+              <div class="text-xs" style="color: var(--text-muted)">Months</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-number" id="days">00</div>
+              <div class="text-xs" style="color: var(--text-muted)">Days</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-number" id="hours">00</div>
+              <div class="text-xs" style="color: var(--text-muted)">Hours</div>
+            </div>
+            <div class="countdown-item">
+              <div class="countdown-number" id="minutes">00</div>
+              <div class="text-xs" style="color: var(--text-muted)">Mins</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 gap-4">
+          <button onclick="showPage('notes-page')" class="feature-card text-left">
+            <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center flex-shrink-0 mr-4">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Love Notes</h4>
+              <p class="text-sm" style="color: var(--text-muted)"><span id="total-notes-home">0</span> notes written</p>
+            </div>
+          </button>
+
+          <button onclick="showPage('memories-page')" class="feature-card text-left">
+            <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center flex-shrink-0 mr-4">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Memory Timeline</h4>
+              <p class="text-sm" style="color: var(--text-muted)"><span id="total-memories-home">0</span> memories saved</p>
+            </div>
+          </button>
+
+          <button onclick="showPage('hearts-game-page')" class="feature-card text-left">
+            <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center flex-shrink-0 mr-4">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">Heart Game</h4>
+              <p class="text-sm" style="color: var(--text-muted)">Collect hearts for rewards</p>
+            </div>
+          </button>
+          
+          <button onclick="showPage('rewards-page')" class="feature-card text-left border-2 border-dashed" style="border-color: var(--gold)">
+             <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mr-4" style="background: linear-gradient(135deg, #FFD700, #FFA500);">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <div>
+              <h4 class="font-semibold">My Rewards</h4>
+              <p class="text-sm" style="color: var(--text-muted)">View claimed vouchers</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES PAGE -->
+  <div id="notes-page" class="page">
+    <div class="relative z-10 p-6">
+      <div class="max-w-2xl mx-auto">
+        <header class="text-center pt-10 pb-6">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2 display-font">Love Notes</h1>
+          <p style="color: var(--text-muted)">Words that touch the heart</p>
+        </header>
+        <button onclick="openNoteModal()" class="btn-primary mb-6 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Write New Note
+        </button>
+        <div id="notes-list" class="space-y-4"></div>
+        <div id="no-notes" class="text-center py-12">
+          <p style="color: var(--text-muted)">No notes yet. Write your first love note!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MEMORIES PAGE -->
+  <div id="memories-page" class="page">
+    <div class="relative z-10 p-6">
+      <div class="max-w-2xl mx-auto">
+        <header class="text-center pt-10 pb-6">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2 display-font">Our Timeline</h1>
+          <p style="color: var(--text-muted)">Moments that define us</p>
+        </header>
+        <button onclick="openMemoryModal()" class="btn-primary mb-6 flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Add Memory
+        </button>
+        <div id="memories-list" class="relative"></div>
+        <div id="no-memories" class="text-center py-12">
+          <p style="color: var(--text-muted)">No memories yet. Start documenting your journey!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HEARTS GAME PAGE -->
+  <div id="hearts-game-page" class="page">
+    <div class="relative z-10 p-6">
+      <div class="max-w-2xl mx-auto">
+        <header class="text-center pt-10 pb-6">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2 display-font">Heart Collector</h1>
+          <p style="color: var(--text-muted)">Collect hearts to earn rewards!</p>
+        </header>
+
+        <div class="glass-card p-6 mb-6">
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-sm" style="color: var(--text-muted)">Current Progress</p>
+            <p class="text-sm font-bold" id="current-target-text">Target: 300</p>
+          </div>
+          <div class="text-5xl font-bold gradient-text display-font text-center my-4" id="heart-score">0</div>
+          
+          <!-- Progress Bar -->
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+          </div>
+          
+          <div class="mt-6 text-center">
+            <button id="claim-btn" onclick="claimReward()" class="btn-primary px-8 hidden" style="width: auto;" disabled>
+              Claim Reward
+            </button>
+            <p id="milestone-msg" class="text-sm mt-2" style="color: var(--gold)"></p>
+          </div>
+        </div>
+
+        <div id="game-area" class="relative glass-card overflow-hidden" style="height: 280px;">
+          <!-- Hearts spawn here -->
+        </div>
+        <p class="text-center mt-4 text-sm" style="color: var(--text-muted)">Tap the hearts before they fall!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- REWARDS PAGE -->
+  <div id="rewards-page" class="page">
+    <div class="relative z-10 p-6">
+      <div class="max-w-2xl mx-auto">
+        <header class="text-center pt-10 pb-6">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2 display-font">My Rewards</h1>
+          <p style="color: var(--text-muted)">Vouchers you've earned</p>
+        </header>
+        
+        <div id="rewards-list" class="space-y-4"></div>
+        <div id="no-rewards" class="text-center py-12">
+          <p style="color: var(--text-muted)">No rewards claimed yet. Keep playing!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS PAGE -->
+  <div id="settings-page" class="page">
+    <div class="relative z-10 p-6">
+      <div class="max-w-2xl mx-auto">
+        <header class="text-center pt-10 pb-6">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2 display-font">Settings</h1>
+        </header>
+
+        <div class="space-y-4">
+          <!-- Mode Toggle -->
+          <div class="feature-card justify-between">
+            <div>
+              <h4 class="font-semibold">Light / Dark Mode</h4>
+              <p class="text-sm" style="color: var(--text-muted)">Toggle appearance</p>
+            </div>
+            <button id="mode-toggle" onclick="toggleMode()" class="relative w-16 h-8 rounded-full transition-all flex-shrink-0" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.1)">
+              <div id="mode-indicator" class="absolute top-1 left-1 w-6 h-6 rounded-full gradient-bg transition-transform"></div>
+            </button>
+          </div>
+          
+          <!-- Color Toggle -->
+          <div class="feature-card justify-between">
+            <div>
+              <h4 class="font-semibold">Theme Color</h4>
+              <p class="text-sm" style="color: var(--text-muted)">Red or Green theme</p>
+            </div>
+            <button id="theme-toggle" onclick="toggleTheme()" class="relative w-16 h-8 rounded-full transition-all flex-shrink-0" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.1)">
+              <div id="theme-indicator" class="absolute top-1 left-1 w-6 h-6 rounded-full gradient-bg transition-transform"></div>
+            </button>
+          </div>
+
+          <!-- Hearts Toggle -->
+          <div class="feature-card justify-between">
+            <div>
+              <h4 class="font-semibold">Floating Hearts</h4>
+              <p class="text-sm" style="color: var(--text-muted)">Background animation</p>
+            </div>
+            <button id="hearts-toggle" onclick="toggleHearts()" class="relative w-16 h-8 rounded-full transition-all flex-shrink-0" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.1)">
+              <div id="hearts-indicator" class="absolute top-1 left-1 w-6 h-6 rounded-full gradient-bg transition-transform"></div>
+            </button>
+          </div>
+
+          <!-- Logout -->
+          <button onclick="logout()" class="feature-card w-full text-left" style="border-color: rgba(255, 77, 109, 0.3);">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 mr-4" style="background: rgba(255, 77, 109, 0.2);">
+              <svg class="w-6 h-6" style="color: var(--accent-1)" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            </div>
+            <div>
+              <h4 class="font-semibold" style="color: var(--accent-1)">Log Out</h4>
+              <p class="text-sm" style="color: var(--text-muted)">See you soon</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="navbar" style="display: none;">
+    <button class="nav-btn active" data-page="home-page" onclick="showPage('home-page')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="nav-btn" data-page="notes-page" onclick="showPage('notes-page')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+      <span>Notes</span>
+    </button>
+    <button class="nav-btn" data-page="hearts-game-page" onclick="showPage('hearts-game-page')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+      <span>Game</span>
+    </button>
+    <button class="nav-btn" data-page="settings-page" onclick="showPage('settings-page')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <span>Settings</span>
+    </button>
+  </nav>
+
+  <!-- Note Modal -->
+  <div id="note-modal" class="modal-overlay" onclick="closeNoteModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3 class="text-2xl font-semibold mb-6 display-font">Write a Note</h3>
+      <form id="note-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Title</label>
+          <input type="text" id="note-title" class="input-field" placeholder="Title" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Message</label>
+          <textarea id="note-message" class="input-field" rows="4" placeholder="Message..." required></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeNoteModal()" class="flex-1 py-3 rounded-full font-medium transition-all" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.1);">Cancel</button>
+          <button type="submit" class="btn-primary flex-1">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Memory Modal -->
+  <div id="memory-modal" class="modal-overlay" onclick="closeMemoryModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <h3 class="text-2xl font-semibold mb-6 display-font">Add Memory</h3>
+      <form id="memory-form" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Date</label>
+          <input type="date" id="memory-date" class="input-field" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Title</label>
+          <input type="text" id="memory-title" class="input-field" placeholder="What happened?" required>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-2" style="color: var(--text-muted)">Description</label>
+          <textarea id="memory-description" class="input-field" rows="3" placeholder="Details..." required></textarea>
+        </div>
+        <div class="flex gap-3 pt-2">
+          <button type="button" onclick="closeMemoryModal()" class="flex-1 py-3 rounded-full font-medium transition-all" style="background: var(--glass); border: 1px solid rgba(255,255,255,0.1);">Cancel</button>
+          <button type="submit" class="btn-primary flex-1">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // --- Configuration & State ---
+    const VALID_CREDENTIALS = { username: 'MarizLovesKim', password: '071103' };
+    const START_DATE = new Date('2024-02-28T00:00:00');
+    
+    // Milestones definition
+    const MILESTONES = [
+      { id: 1, target: 300, reward: '1 Free McDo Meal Voucher' },
+      { id: 2, target: 500, reward: 'Starbucks Voucher' },
+      { id: 3, target: 1000, reward: '500 Pesos Voucher' },
+      { id: 4, target: 2000, reward: '1000 Pesos Voucher' }
+    ];
+
+    // Load state from LocalStorage
+    let notes = JSON.parse(localStorage.getItem('loveNotes')) || [];
+    let memories = JSON.parse(localStorage.getItem('loveMemories')) || [];
+    let heartScore = parseInt(localStorage.getItem('heartScore')) || 0;
+    let unlockedMilestoneIndex = parseInt(localStorage.getItem('unlockedMilestoneIndex')) || 0;
+    let claimedRewards = JSON.parse(localStorage.getItem('claimedRewards')) || [];
+    
+    let isGreenTheme = localStorage.getItem('theme') === 'green';
+    let isLightMode = localStorage.getItem('mode') === 'light';
+    let heartsEnabled = localStorage.getItem('heartsEnabled') !== 'false';
+    
+    let gameInterval = null;
+    let floatingHeartsInterval = null;
+
+    // --- Initialization ---
+    const loginForm = document.getElementById('login-form');
+    const loginPage = document.getElementById('login-page');
+    const navbar = document.getElementById('navbar');
+    const loginError = document.getElementById('login-error');
+
+    // Apply saved preferences
+    if (isGreenTheme) document.body.classList.add('theme-green');
+    if (isLightMode) document.body.classList.add('theme-light');
+    
+    updateToggles();
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if (username === VALID_CREDENTIALS.username && password === VALID_CREDENTIALS.password) {
+        loginPage.classList.remove('active');
+        navbar.style.display = 'flex';
+        showPage('home-page');
+        initApp();
+      } else {
+        loginError.classList.remove('hidden');
+        loginForm.classList.add('shake');
+        setTimeout(() => loginForm.classList.remove('shake'), 500);
+      }
+    });
+
+    function initApp() {
+      updateTimeTogether();
+      setInterval(updateTimeTogether, 1000);
+      
+      updateStats();
+      renderNotes();
+      renderMemories();
+      renderRewards();
+      updateGameUI();
+      
+      if (heartsEnabled) startFloatingHearts();
+    }
+
+    // --- Time Together Calculator ---
+    function updateTimeTogether() {
+      const now = new Date();
+      const diff = now - START_DATE;
+
+      if (diff < 0) {
+        document.getElementById('years').textContent = "00";
+        document.getElementById('months').textContent = "00";
+        document.getElementById('days').textContent = "00";
+        document.getElementById('hours').textContent = "00";
+        document.getElementById('minutes').textContent = "00";
+        return;
+      }
+
+      const totalSeconds = Math.floor(diff / 1000);
+      const totalMinutes = Math.floor(totalSeconds / 60);
+      const totalHours = Math.floor(totalMinutes / 60);
+      const totalDays = Math.floor(totalHours / 24);
+      
+      const years = Math.floor(totalDays / 365);
+      const remainingDaysAfterYears = totalDays % 365;
+      const months = Math.floor(remainingDaysAfterYears / 30);
+      const days = remainingDaysAfterYears % 30;
+      
+      const hours = totalHours % 24;
+      const minutes = totalMinutes % 60;
+
+      document.getElementById('years').textContent = String(years).padStart(2, '0');
+      document.getElementById('months').textContent = String(months).padStart(2, '0');
+      document.getElementById('days').textContent = String(days).padStart(2, '0');
+      document.getElementById('hours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('minutes').textContent = String(minutes).padStart(2, '0');
+    }
+
+    // --- Navigation ---
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+      
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === pageId);
+      });
+
+      if (pageId === 'hearts-game-page') startGame();
+      else stopGame();
+    }
+
+    // --- Game Logic ---
+    function updateGameUI() {
+      const currentMilestone = MILESTONES[unlockedMilestoneIndex];
+      const claimBtn = document.getElementById('claim-btn');
+      const progressBar = document.getElementById('progress-bar');
+      const targetText = document.getElementById('current-target-text');
+      const scoreDisplay = document.getElementById('heart-score');
+      const msgDisplay = document.getElementById('milestone-msg');
+
+      if (!currentMilestone) {
+        targetText.textContent = "All Completed!";
+        scoreDisplay.textContent = heartScore;
+        progressBar.style.width = '100%';
+        claimBtn.classList.add('hidden');
+        msgDisplay.textContent = "You've claimed all rewards!";
+        return;
+      }
+
+      targetText.textContent = `Target: ${currentMilestone.target}`;
+      scoreDisplay.textContent = heartScore;
+      
+      const prevTarget = unlockedMilestoneIndex > 0 ? MILESTONES[unlockedMilestoneIndex - 1].target : 0;
+      const range = currentMilestone.target - prevTarget;
+      const currentProgress = heartScore - prevTarget;
+      const percentage = Math.min((currentProgress / range) * 100, 100);
+      
+      progressBar.style.width = percentage + '%';
+
+      if (heartScore >= currentMilestone.target) {
+        claimBtn.classList.remove('hidden');
+        claimBtn.disabled = false;
+        msgDisplay.textContent = `Reward Unlocked: ${currentMilestone.reward}!`;
+      } else {
+        claimBtn.classList.add('hidden');
+        msgDisplay.textContent = '';
+      }
+    }
+
+    function claimReward() {
+      const currentMilestone = MILESTONES[unlockedMilestoneIndex];
+      if (!currentMilestone || heartScore < currentMilestone.target) return;
+
+      claimedRewards.push({
+        id: currentMilestone.id,
+        name: currentMilestone.reward,
+        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+      });
+      localStorage.setItem('claimedRewards', JSON.stringify(claimedRewards));
+
+      heartScore = 0;
+      unlockedMilestoneIndex++;
+      
+      localStorage.setItem('heartScore', heartScore);
+      localStorage.setItem('unlockedMilestoneIndex', unlockedMilestoneIndex);
+      
+      renderRewards();
+      updateGameUI();
+    }
+
+    function startGame() {
+      const gameArea = document.getElementById('game-area');
+      
+      function spawnHeart() {
+        if (document.hidden) return;
+        
+        const heart = document.createElement('div');
+        heart.className = 'absolute cursor-pointer transition-transform active:scale-125';
+        heart.style.left = Math.random() * (gameArea.offsetWidth - 50) + 'px';
+        heart.style.top = '-50px';
+        heart.innerHTML = `<svg width="40" height="40" viewBox="0 0 24 24" fill="var(--accent-1)" stroke="var(--accent-2)" stroke-width="1"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+        
+        gameArea.appendChild(heart);
+        
+        let pos = -50;
+        const speed = Math.random() * 2 + 1.5;
+        const wobble = Math.random() * 30 - 15;
+        
+        const fall = setInterval(() => {
+          pos += speed;
+          heart.style.top = pos + 'px';
+          heart.style.left = parseFloat(heart.style.left) + Math.sin(pos / 20) * wobble * 0.1 + 'px';
+          
+          if (pos > gameArea.offsetHeight) {
+            clearInterval(fall);
+            heart.remove();
+          }
+        }, 20);
+        
+        heart.onclick = function() {
+          clearInterval(fall);
+          heart.remove();
+          heartScore++;
+          localStorage.setItem('heartScore', heartScore);
+          updateGameUI();
+          
+          for (let i = 0; i < 3; i++) {
+            createClickHeart(heart.offsetLeft + 20, heart.offsetTop + 20);
+          }
+        };
+      }
+      
+      gameInterval = setInterval(spawnHeart, 600);
+    }
+
+    function stopGame() {
+      if (gameInterval) clearInterval(gameInterval);
+    }
+
+    // --- Rewards Page ---
+    function renderRewards() {
+      const list = document.getElementById('rewards-list');
+      const emptyMsg = document.getElementById('no-rewards');
+      
+      if (claimedRewards.length === 0) {
+        list.innerHTML = '';
+        emptyMsg.classList.remove('hidden');
+      } else {
+        emptyMsg.classList.add('hidden');
+        list.innerHTML = claimedRewards.map(r => `
+          <div class="glass-card p-5 reward-card">
+            <div class="flex justify-between items-center">
+               <div>
+                 <h4 class="font-bold text-lg">${r.name}</h4>
+                 <p class="text-sm opacity-80">Claimed on ${r.date}</p>
+               </div>
+               <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background: rgba(255,215,0,0.2)">
+                 <svg class="w-6 h-6" style="color: #DAA520" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+               </div>
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
+    // --- Notes & Memories ---
+    function openNoteModal() { document.getElementById('note-modal').classList.add('active'); }
+    function closeNoteModal(e) { 
+      if (!e || e.target === e.currentTarget) {
+        document.getElementById('note-modal').classList.remove('active'); 
+        document.getElementById('note-form').reset();
+      }
+    }
+
+    document.getElementById('note-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const note = {
+        id: Date.now(),
+        title: document.getElementById('note-title').value,
+        message: document.getElementById('note-message').value,
+        date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+      };
+      notes.unshift(note);
+      localStorage.setItem('loveNotes', JSON.stringify(notes));
+      renderNotes();
+      updateStats();
+      closeNoteModal();
+    });
+
+    function renderNotes() {
+      const list = document.getElementById('notes-list');
+      const empty = document.getElementById('no-notes');
+      if (notes.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      list.innerHTML = notes.map(note => `
+        <div class="glass-card p-5" style="background: linear-gradient(135deg, var(--card-bg), var(--glass))">
+          <div class="flex justify-between items-start mb-2">
+            <h4 class="font-semibold">${escapeHtml(note.title)}</h4>
+            <button onclick="deleteNote(${note.id})" class="p-1 opacity-50 hover:opacity-100 transition-opacity">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <p style="color: var(--text-primary)" class="whitespace-pre-wrap">${escapeHtml(note.message)}</p>
+          <p class="text-xs mt-3" style="color: var(--text-muted)">${note.date}</p>
+        </div>
+      `).join('');
+    }
+
+    function deleteNote(id) {
+      notes = notes.filter(n => n.id !== id);
+      localStorage.setItem('loveNotes', JSON.stringify(notes));
+      renderNotes(); updateStats();
+    }
+
+    function openMemoryModal() { document.getElementById('memory-modal').classList.add('active'); }
+    function closeMemoryModal(e) { 
+       if (!e || e.target === e.currentTarget) {
+        document.getElementById('memory-modal').classList.remove('active'); 
+        document.getElementById('memory-form').reset();
+      }
+    }
+
+    document.getElementById('memory-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const memory = {
+        id: Date.now(),
+        date: document.getElementById('memory-date').value,
+        title: document.getElementById('memory-title').value,
+        description: document.getElementById('memory-description').value
+      };
+      memories.push(memory);
+      memories.sort((a, b) => new Date(b.date) - new Date(a.date));
+      localStorage.setItem('loveMemories', JSON.stringify(memories));
+      renderMemories();
+      updateStats();
+      closeMemoryModal();
+    });
+
+    function renderMemories() {
+      const list = document.getElementById('memories-list');
+      const empty = document.getElementById('no-memories');
+      if (memories.length === 0) { list.innerHTML = ''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+      
+      list.innerHTML = memories.map((m, i) => `
+        <div class="timeline-item ${i === memories.length - 1 ? 'border-l-transparent' : ''}">
+          <div class="glass-card p-5 ml-4">
+            <div class="flex justify-between items-start mb-2">
+              <p class="text-sm font-medium" style="color: var(--accent-2)">${formatDate(m.date)}</p>
+              <button onclick="deleteMemory(${m.id})" class="p-1 opacity-50 hover:opacity-100 transition-opacity">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <h4 class="font-semibold mb-1">${escapeHtml(m.title)}</h4>
+            <p class="text-sm" style="color: var(--text-muted)">${escapeHtml(m.description)}</p>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function deleteMemory(id) {
+      memories = memories.filter(m => m.id !== id);
+      localStorage.setItem('loveMemories', JSON.stringify(memories));
+      renderMemories(); updateStats();
+    }
+
+    // --- Utilities & Settings ---
+    function updateStats() {
+      document.getElementById('total-notes-home').textContent = notes.length;
+      document.getElementById('total-memories-home').textContent = memories.length;
+    }
+
+    function toggleMode() {
+      isLightMode = !isLightMode;
+      document.body.classList.toggle('theme-light', isLightMode);
+      localStorage.setItem('mode', isLightMode ? 'light' : 'dark');
+      updateToggles();
+    }
+
+    function toggleTheme() {
+      isGreenTheme = !isGreenTheme;
+      document.body.classList.toggle('theme-green', isGreenTheme);
+      localStorage.setItem('theme', isGreenTheme ? 'green' : 'red');
+      updateToggles();
+    }
+
+    function toggleHearts() {
+      heartsEnabled = !heartsEnabled;
+      localStorage.setItem('heartsEnabled', heartsEnabled);
+      if (heartsEnabled) startFloatingHearts();
+      else {
+        clearInterval(floatingHeartsInterval);
+        document.getElementById('hearts-container').innerHTML = '';
+      }
+      updateToggles();
+    }
+
+    function updateToggles() {
+      document.getElementById('mode-indicator').style.transform = isLightMode ? 'translateX(32px)' : 'translateX(0)';
+      document.getElementById('theme-indicator').style.transform = isGreenTheme ? 'translateX(32px)' : 'translateX(0)';
+      document.getElementById('hearts-indicator').style.transform = heartsEnabled ? 'translateX(32px)' : 'translateX(0)';
+    }
+
+    function logout() {
+      stopGame();
+      clearInterval(floatingHeartsInterval);
+      navbar.style.display = 'none';
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      loginPage.classList.add('active');
+      document.getElementById('username').value = '';
+      document.getElementById('password').value = '';
+      loginError.classList.add('hidden');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    // --- Visual Effects ---
+    function createFloatingHeart() {
+      if (!heartsEnabled) return;
+      const container = document.getElementById('hearts-container');
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = `<svg width="24" height="24" viewBox="0 0 24 24" fill="var(--accent-1)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+      
+      const size = Math.random() * 20 + 15;
+      heart.style.left = Math.random() * 100 + 'vw';
+      heart.style.animationDuration = (Math.random() * 5 + 6) + 's';
+      heart.style.animationDelay = Math.random() * 2 + 's';
+      heart.style.transform = `scale(${size / 20})`;
+      container.appendChild(heart);
+      setTimeout(() => heart.remove(), 15000);
+    }
+
+    function startFloatingHearts() {
+      for (let i = 0; i < 5; i++) setTimeout(createFloatingHeart, i * 1000);
+      floatingHeartsInterval = setInterval(createFloatingHeart, 2000);
+    }
+
+    function createClickHeart(x, y) {
+      const heart = document.createElement('div');
+      heart.className = 'click-heart';
+      heart.style.left = x + 'px';
+      heart.style.top = y + 'px';
+      heart.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="var(--accent-1)"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>`;
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1000);
+    }
+
+    document.addEventListener('click', function(e) {
+      if (loginPage.classList.contains('active')) return;
+      if (e.target.closest('button') || e.target.closest('input') || e.target.closest('textarea') || e.target.closest('a')) return;
+      createClickHeart(e.clientX - 10, e.clientY - 10);
+    });
+  </script>
+</body>
+</html>
